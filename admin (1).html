@@ -1,0 +1,209 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Site Admin — Karolina Landing Page (Mobile‑optimized)</title>
+<style>
+  :root { --bg:#0b1220; --panel:#0f172a; --panel2:#0c1426; --text:#e5e7eb; --muted:#94a3b8; --ok:#22c55e; }
+  *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;line-height:1.55}
+  .wrap{max-width:1100px;margin:0 auto;padding:22px}
+  h1{margin:6px 0 12px} h2{margin:18px 0 10px}
+  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;align-items:start}
+  .card{background:var(--panel);border:1px solid rgba(148,163,184,.18);border-radius:14px;padding:16px}
+  label{display:block;font-weight:700;margin:10px 0 6px}
+  input[type="text"], input[type="email"], textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(148,163,184,.25);background:var(--panel2);color:var(--text)}
+  textarea{min-height:90px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn, a.btn{background:#2563eb;border:none;color:white;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
+  .btn.alt{background:var(--ok);color:#08210a}
+  .btn[aria-disabled="true"]{filter:grayscale(1);opacity:.55;pointer-events:none}
+  .muted{color:var(--muted)}
+  .preview{margin-top:12px;border-top:1px dashed rgba(148,163,184,.28);padding-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Admin Console</h1>
+  <p class="muted">Generate a mobile‑optimized, single‑file <code>index.html</code> (portrait embedded as base64). Upload it to your GitHub Pages repo.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Basics</h2>
+      <label>Name</label><input id="name" type="text" value="Karolina Huber">
+      <label>Lead paragraph</label><textarea id="lead">I’m an independent investor and financial analyst with 17+ years across foreign‑exchange and derivatives trading, rules‑based multi‑asset portfolio construction, and cash‑flow real estate. Formerly at Morgan Stanley PWM for 11 years, I combine macro judgment with quantitative rules to control drawdowns, manage liquidity, and rebalance with discipline.</textarea>
+      <label>Location · Industry</label><input id="meta" type="text" value="Warsaw · Industry: Independent Investor">
+
+      <h2>Contacts</h2>
+      <label>Email</label><input id="email" type="email" value="karolina_huber@outlook.com">
+      <label>WhatsApp (digits only)</label><input id="wa" type="text" value="48732123227">
+      <label>Facebook URL</label><input id="fb" type="text" value="https://www.facebook.com/profile.php?id=100007160794883">
+
+      <h2>About</h2>
+      <label>Quote</label><input id="quote" type="text" value="When God closes this door, he will open another window.">
+      <label>About paragraphs (blank line = new paragraph)</label>
+      <textarea id="about">I enjoy connecting with experts and exchanging opinions and experiences. I do my best to add potential value wherever I can.
+
+I’m a very sincere person and believe in the law of attraction: treat others well, and they will treat you well. Believe in the world’s goodness, and the world will reveal more goodness.</textarea>
+
+      <h2>Core Strengths (one per line)</h2>
+      <textarea id="strengths">Multi‑asset portfolio construction & rebalancing (FX, commodities, cash‑flow real estate)
+Risk budgeting, liquidity & drawdown management; rules‑based execution
+FX & derivatives trading (USD/EUR/GBP; gold, oil, natural gas & related instruments)
+HNW client coverage; cross‑account coordination; trading/ops workflows
+Real‑estate project evaluation and rental operations for stable cash flow
+Cross‑client/market/country due diligence; risk & compliance process improvement</textarea>
+
+      <h2>Experience (blocks separated by blank lines; '-' bullets)</h2>
+      <textarea id="exp">**Independent Financial Analyst / Investor — Self‑employed** (Aug 2019 – Present · Warsaw / Europe & Asia · hybrid)
+- Trade FX & derivatives with a risk‑first, rules‑driven process combining macro context and quantitative signals.
+- Build diversified multi‑asset portfolios; schedule rebalancing to manage volatility and liquidity.
+- Manage rental real‑estate projects to generate stable cash flow and long‑term capital appreciation.
+- Conduct due diligence across clients, markets, and jurisdictions; document decision rules and post‑trade reviews.
+
+**Morgan Stanley — Private Wealth Management (HNW)** (May 2009 – Aug 2021 · Warsaw)
+- Owned HNW client relationships; coordinated cross‑account trading, portfolio management, and operations.
+- Executed trades in restricted stock, FX liquidity derivatives, USD/EUR/GBP, and energy‑linked instruments.
+- Partnered with Compliance & Risk to streamline workflows and strengthen controls.
+- Developed proposals and portfolio reviews aligned to objectives and risk tolerance.
+
+**PGNiG — Investment Analyst / Natural Gas Trading** (Jul 2007 – Apr 2008 · Poland)
+- Supported research and trading of natural gas and related derivatives; monitored fundamentals and risk.
+
+**Summer Analyst — Commodities Sales & Trading (Intern)** (Jun 2006 – Aug 2006 · PZU & TFI)</textarea>
+    </div>
+
+    <div class="card">
+      <h2>Portrait</h2>
+      <input id="photo" type="file" accept="image/*">
+      <div class="preview"><img id="previewImg" alt="Preview" style="max-width:100%;height:auto;border-radius:12px;border:1px solid rgba(148,163,184,.25);display:none"></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="genBtn">Generate HTML</button>
+        <a class="btn alt" id="dlBtn" aria-disabled="true">Download index.html</a>
+      </div>
+      <p class="muted" id="status"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentBase64=null;
+const previewImg=document.getElementById('previewImg');
+document.getElementById('photo').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{const u=r.result; previewImg.src=u; previewImg.style.display='block'; currentBase64=u.split(',')[1];};
+  r.readAsDataURL(f);
+});
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function bulletsToList(t){return t.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>'<li>'+esc(l.trim().slice(1).trim())+'</li>').join('')}
+function expsToHTML(t){return t.split(/\n\n+/).map(b=>{const L=b.split('\n'); if(!L[0])return''; const title=esc(L[0]).replace(/^\*\*|\*\*$/g,''); const ul=bulletsToList(L.slice(1).join('\n')); return '<p><strong>'+title+'</strong></p>'+(ul?'<ul>'+ul+'</ul>':'')}).join('\n')}
+const PX='R0lGODlhAQABAAAAACw='; // 1x1 gif
+
+const tpl=d=>`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>${esc(d.name)} — Independent Investor & Financial Analyst</title>
+<meta name="description" content="${esc(d.lead.slice(0,200))}">
+<style>
+  :root { --bg: #f7f8fc; --card: #ffffff; --text: #0f172a; --muted:#475569;
+    --shadow: 0 8px 24px rgba(15,23,42,.10), 0 2px 8px rgba(15,23,42,.06);
+    --radius-pill: 999px; --radius-card: 18px; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background: var(--bg); color: var(--text);
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
+    line-height: 1.65; -webkit-text-size-adjust: 100%;
+  }
+  img { max-width: 100%; height: auto; display:block; }
+  a { color: inherit; }
+  .container { max-width: 1040px; margin: 0 auto; padding: 24px 16px calc(132px + env(safe-area-inset-bottom)); }
+  main.hero { display:grid; grid-template-columns: 1.1fr .9fr; gap: 28px; align-items: center; }
+  .hero h1 { font-size: clamp(36px, 6.4vw, 62px); line-height: 1.06; margin: 0 0 10px; letter-spacing:.2px; }
+  .hero p.lead { font-size: clamp(15.5px, 2.1vw, 18px); color: var(--muted); margin-top: 6px; }
+  .meta { color:#64748b; margin: 10px 0 16px; }
+  .ctas { display:flex; flex-wrap: wrap; gap: 12px; }
+  .cta-pill { display:inline-flex; align-items:center; gap: 10px; padding: 14px 20px; border-radius: var(--radius-pill); font-weight: 700; border: 1px solid rgba(15,23,42,.08); box-shadow: var(--shadow); transition: transform .08s ease, filter .12s ease; text-decoration: none; }
+  .cta-pill:hover { filter: brightness(1.06); transform: translateY(-1px); }
+  .cta-email { color:#fff; background: linear-gradient(135deg,#c084fc,#60a5fa); }
+  .cta-wa { color:#06220c; background:#22c55e; }
+  .cta-fb { color:#eaf2ff; background:#1877F2; }
+  .card { background: var(--card); border-radius: var(--radius-card); box-shadow: var(--shadow); overflow:hidden; border:1px solid #e5e7eb; }
+  .photo img { width:100%; height:auto; }
+  h2 { font-size: clamp(19px,2.3vw,26px); margin: 0 0 10px; }
+  p, .lead, .meta { overflow-wrap: anywhere; word-break: break-word; }
+  ul { margin: 8px 0 0 20px; padding:0; } li { margin: 8px 0; color:#334155; }
+  .quote { font-style: italic; background:#eef2ff; padding: 10px 12px; border-radius: 12px; border:1px dashed #c7d2fe; }
+  .section { padding:18px 20px; margin-top:20px; }
+  .two-col { display:grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .bottom-nav { position: fixed; left:50%; transform: translateX(-50%); bottom: calc(12px + env(safe-area-inset-bottom)); background:#fff; border:1px solid #e5e7eb; border-radius: 999px; box-shadow: var(--shadow); padding: 6px 8px; z-index: 10; display:grid; grid-template-columns: repeat(4,1fr); gap: 4px; width: min(560px, 94%); }
+  .bottom-nav a { text-align:center; padding: 10px 8px; border-radius: 999px; color:#0f172a; text-decoration:none; font-weight:600; }
+  .bottom-nav a:hover { background:#f1f5f9; }
+  footer { text-align:center; color:#64748b; padding: 24px 0 0; }
+  @media (max-width: 980px) { main.hero { grid-template-columns: 1fr; gap: 18px; } }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; gap: 14px; } }
+  @media (max-width: 520px) { .container { padding: 18px 12px calc(138px + env(safe-area-inset-bottom)); } .hero h1 { font-size: 30px; line-height: 1.14; } .ctas { flex-direction: column; } .cta-pill { width: 100%; justify-content: center; padding: 14px 16px; } }
+  #about, #experience, #contact { scroll-margin-top: 14px; }
+</style>
+</head>
+<body id="top">
+  <div class="container">
+    <main class="hero">
+      <section>
+        <h1>${esc(d.name)}</h1>
+        <p class="lead">${esc(d.lead)}</p>
+        <div class="meta">${esc(d.meta)}</div>
+        <div id="contact" class="ctas">
+          <a class="cta-pill cta-email" href="mailto:${esc(d.email)}"><span>✉</span><span>Email</span></a>
+          <a class="cta-pill cta-wa" href="https://wa.me/${esc(d.wa)}" target="_blank" rel="noopener"><span>🟢</span><span>WhatsApp</span></a>
+          <a class="cta-pill cta-fb" href="${esc(d.fb)}" target="_blank" rel="noopener"><span>f</span><span>Facebook</span></a>
+        </div>
+      </section>
+      <aside class="card photo">
+        <img alt="Portrait of ${esc(d.name)}" src="data:image/gif;base64,${d.photo||PX}">
+      </aside>
+    </main>
+
+    <section id="about" class="card section">
+      <h2>About</h2>
+      ${d.about.split('\n\n').map(lambda p: '<p>'+esc(p)+'</p>').__str__()}
+      <p class="quote">“${esc(d.quote)}”</p>
+    </section>
+
+    <section class="two-col" aria-label="Highlights">
+      <div class="card section">
+        <h2>Core Strengths</h2>
+        <ul>${d.strengths.split('\n').map(lambda s: '<li>'+esc(s)+'</li>').__str__()}</ul>
+      </div>
+      <div class="card section">
+        <h2>Investment Philosophy</h2>
+        <p><strong>“Not to predict, but to prepare.”</strong> Turn macro signals into rules, layer assets by purpose, rebalance on schedule, and let compounding do its work.</p>
+      </div>
+    </section>
+
+    <section id="experience" class="card section">
+      <h2>Experience</h2>
+      ${expsToHTML(d.exp)}
+    </section>
+
+    <footer>© ${new Date().getFullYear()} ${esc(d.name)}. All rights reserved.</footer>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="#top">Top</a>
+    <a href="#about">About</a>
+    <a href="#experience">Experience</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</body>
+</html>`;
+
+let blobUrl=null;
+const genBtn=document.getElementById('genBtn'); const dlBtn=document.getElementById('dlBtn'); const status=document.getElementById('status');
+function collect(){return {name:document.getElementById('name').value.trim(),lead:document.getElementById('lead').value.trim(),meta:document.getElementById('meta').value.trim(),email:document.getElementById('email').value.trim(),wa:document.getElementById('wa').value.trim(),fb:document.getElementById('fb').value.trim(),quote:document.getElementById('quote').value.trim(),about:document.getElementById('about').value.trim(),strengths:document.getElementById('strengths').value.trim(),exp:document.getElementById('exp').value.trim(),photo:currentBase64};}
+genBtn.addEventListener('click',()=>{try{const html=tpl(collect());const blob=new Blob([html],{type:'text/html'}); if(blobUrl)URL.revokeObjectURL(blobUrl); blobUrl=URL.createObjectURL(blob); dlBtn.href=blobUrl; dlBtn.download='index.html'; dlBtn.setAttribute('aria-disabled','false'); status.textContent='Generated. Click "Download index.html" and upload to GitHub.';}catch(e){status.textContent='Error: '+e.message;}});
+</script>
+</body>
+</html>
